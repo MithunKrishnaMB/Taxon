@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.base import Base # Ensures all models are registered with SQLAlchemy
 
 # Initialize the FastAPI Application
 app = FastAPI(

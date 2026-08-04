@@ -14,7 +14,7 @@ class TallyBridgeService:
         self.job_repo = job_repo
         self.circuit_breaker = ExponentialBackoffCircuitBreaker()
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-pro",
+            model="gemini-2.5-pro",
             temperature=0.0,
             google_api_key=settings.GOOGLE_API_KEY,
         )

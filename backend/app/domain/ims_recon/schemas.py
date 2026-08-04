@@ -1,6 +1,6 @@
 import uuid
 from decimal import Decimal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from app.domain.ims_recon.models import ReconStatus
 
 
@@ -15,6 +15,12 @@ class InvoiceReconcileRequest(BaseModel):
         default_factory=lambda: [0.1] * 1536,
         description="1536-dim embedding representing invoice metadata"
     )
+
+    @field_validator("vector_embed")
+    def validate_vector_length(cls, v):
+        if len(v) != 1536:
+            raise ValueError(f"Vector embedding must have exactly 1536 dimensions, got {len(v)}")
+        return v
 
 
 class ReconciliationResponse(BaseModel):

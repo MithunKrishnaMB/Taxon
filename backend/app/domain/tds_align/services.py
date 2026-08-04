@@ -14,7 +14,7 @@ class TdsAlignService:
     def __init__(self, anomaly_repo: TdsAnomalyRepository):
         self.anomaly_repo = anomaly_repo
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-pro",
+            model="gemini-2.5-pro",
             temperature=0.2,
             google_api_key=settings.GOOGLE_API_KEY,
         )

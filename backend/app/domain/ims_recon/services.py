@@ -53,7 +53,7 @@ class ImsReconciliationService:
             prompt = (
                 f"Evaluate this GST invoice for Blocked Input Tax Credit under CGST Act Section 17(5).\n"
                 f"Invoice Details: Supplier='{state['gstr_supplier']}', Doc='{state['erp_doc_no']}', Amount='{state['erp_amount']}'.\n"
-                "Rules: Credits are BLOCKED (True) for motor vehicles, catering/food, beverages, beauty treatment, and employee gifts.\n"
+                "Rules: Credits are BLOCKED (True) for motor vehicles, catering/food, beverages, beauty treatment and employee gifts.\n"
                 "Respond strictly in JSON: {\"is_blocked\": true/false, \"reason\": \"string\"}"
             )
             response = self.llm.invoke([

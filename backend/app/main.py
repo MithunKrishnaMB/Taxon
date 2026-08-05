@@ -10,7 +10,7 @@ from app.core.base import Base # Ensures all models are registered with SQLAlche
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
-    description="Agentic GSTR-2B Reconciliation, TDS Anomaly Detection, and Tally ERP Bridge.",
+    description="Agentic GSTR-2B Reconciliation, TDS Anomaly Detection and Tally ERP Bridge.",
     docs_url="/docs",  # Enables interactive Swagger UI testing at /docs
 )
 

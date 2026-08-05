@@ -15,7 +15,7 @@ class BaseRepository(Generic[ModelType]):
     """Generic CRUD repository for asynchronous database operations.
 
     Why we use this:
-    It provides standard Create, Read, Update, and Delete methods automatically
+    It provides standard Create, Read, Update and Delete methods automatically
     for any model class we pass to it, keeping code clean and DRY (Don't Repeat Yourself).
     """
 

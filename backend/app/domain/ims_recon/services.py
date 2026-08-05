@@ -122,7 +122,7 @@ class ImsReconciliationService:
             "reasoning": "",
         }
 
-        final_state = self.workflow.invoke(initial_state)
+        final_state = await self.workflow.ainvoke(initial_state)
 
         # 3. Save the reconciliation decision via Repository
         recon = await self.recon_repo.create({

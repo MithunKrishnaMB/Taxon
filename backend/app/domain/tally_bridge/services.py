@@ -14,7 +14,7 @@ class TallyBridgeService:
         self.job_repo = job_repo
         self.circuit_breaker = ExponentialBackoffCircuitBreaker()
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-pro",
+            model="gemini-2.5-flash",
             temperature=0.0,
             google_api_key=settings.GOOGLE_API_KEY,
         )
@@ -22,22 +22,16 @@ class TallyBridgeService:
     async def process_natural_language_query(
         self, tenant_id: str, prompt_text: str
     ) -> TallySyncJob:
-        """Translate English audit queries into Tally Definition Language (TDL) XML."""
-        
-        # 1. Ask Gemini to generate valid Tally XML
-        tdl_xml = self._translate_to_tdl_xml(prompt_text)
+        # Await our non-blocking TDL XML translator
+        tdl_xml = await self._translate_to_tdl_xml(prompt_text)
 
-        # 2. Check if Tally's local server is safe to talk to
         current_cb_state = self.circuit_breaker.state
         if not self.circuit_breaker.can_execute():
-            # Tally is offline! We save the job as QUEUED so a background worker can retry later
             job_status = JobStatus.QUEUED
         else:
-            # Safe to execute! In a live app, we would make the HTTP POST to http://localhost:9000 here
             job_status = JobStatus.COMPLETED
             self.circuit_breaker.record_success()
 
-        # 3. Save job state in database
         job = await self.job_repo.create({
             "tenant_id": tenant_id,
             "tdl_query_xml": tdl_xml,
@@ -46,13 +40,14 @@ class TallyBridgeService:
         })
         return job
 
-    def _translate_to_tdl_xml(self, query: str) -> str:
+    async def _translate_to_tdl_xml(self, query: str) -> str:
         prompt = (
             f"Translate this accounting audit request into valid Tally Definition Language (TDL) XML export envelope:\n"
             f"Request: '{query}'\n"
             "Output ONLY the raw <ENVELOPE>...</ENVELOPE> XML string without Markdown formatting."
         )
-        response = self.llm.invoke([
+        # Use .ainvoke() so the asyncio event loop remains non-blocking!
+        response = await self.llm.ainvoke([
             SystemMessage(content="You are an expert TallyPrime TDL Developer."),
             HumanMessage(content=prompt),
         ])

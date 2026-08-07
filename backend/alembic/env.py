@@ -17,6 +17,7 @@ from app.domain.ims_recon.models import ErpInvoice, Gstr2bInvoice, ImsReconcilia
 from app.domain.tds_align.models import TdsAnomaly, TdsLedger
 from app.domain.tally_bridge.models import TallySyncJob
 from app.domain.ingestion.models import IngestionJob
+from app.domain.audit_log.models import AuditLog
 
 # This is the Alembic Config object, which provides access to values within alembic.ini
 config = context.config

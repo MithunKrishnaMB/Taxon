@@ -1,19 +1,38 @@
 # pyrefly: ignore [missing-import]
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, ims_recon, ingestion, tds_align, tally_bridge
+from app.api.v1.endpoints import (
+    auth,
+    ims_recon,
+    ingestion,
+    audit_log,
+    export,
+    tds_align,
+    tally_bridge,
+)
 
 api_router = APIRouter()
 
-# Register Authentication & Firm endpoints
+# 1. Identity & Security Layer
 api_router.include_router(
     auth.router, prefix="/auth", tags=["Authentication & CA Firm Identity"]
 )
 
-# Bulk ETL & File Ingestion
+# 2. Bulk ETL & File Ingestion
 api_router.include_router(
     ingestion.router, prefix="/ingestion", tags=["Bulk ETL & File Ingestion"]
 )
 
+# 3. Statutory Audit Trail
+api_router.include_router(
+    audit_log.router, prefix="/audit", tags=["Statutory Audit Trail & Overrides"]
+)
+
+# 4. Government Portal Export Engine
+api_router.include_router(
+    export.router, prefix="/export", tags=["Government Portal Export Engine"]
+)
+
+# 5. Core Domain AI Endpoints
 api_router.include_router(
     ims_recon.router, prefix="/ims", tags=["Auto-IMS Reconciliation"]
 )

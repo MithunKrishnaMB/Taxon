@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     GOOGLE_API_KEY: str | None = None
 
+    # JWT Security Settings
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours session expiry
+
     model_config = SettingsConfigDict(
         env_file=".env", env_ignore_empty=True, extra="ignore"
     )

@@ -1,10 +1,14 @@
 # pyrefly: ignore [missing-import]
 from fastapi import APIRouter
-from app.api.v1.endpoints import ims_recon, tds_align, tally_bridge
+from app.api.v1.endpoints import auth, ims_recon, tds_align, tally_bridge
 
 api_router = APIRouter()
 
-# Register our three domain endpoints under clean API prefixes
+# Register Authentication & Firm endpoints
+api_router.include_router(
+    auth.router, prefix="/auth", tags=["Authentication & CA Firm Identity"]
+)
+
 api_router.include_router(
     ims_recon.router, prefix="/ims", tags=["Auto-IMS Reconciliation"]
 )

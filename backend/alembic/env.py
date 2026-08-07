@@ -12,7 +12,7 @@ from app.core.database import Base
 
 # 2. IMPORTANT: Import all domain models so Alembic can "see" them!
 # If you don't import a model here, Alembic won't create its table.
-from app.domain.auth.models import Tenant
+from app.domain.auth.models import CAFirm, CAUser, Tenant
 from app.domain.ims_recon.models import ErpInvoice, Gstr2bInvoice, ImsReconciliation
 from app.domain.tds_align.models import TdsAnomaly, TdsLedger
 from app.domain.tally_bridge.models import TallySyncJob

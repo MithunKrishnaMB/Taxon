@@ -45,7 +45,7 @@ def create_access_token(
     """Generate a signed JSON Web Token (JWT) access badge.
 
     What it does:
-    1. Creates a payload containing user ID ('sub'), CA Firm ID ('firm_id'), and email.
+    1. Creates a payload containing user ID ('sub'), CA Firm ID ('firm_id') and email.
     2. Adds an expiration timestamp ('exp').
     3. Cryptographically signs the payload using our project's SECRET_KEY.
     """

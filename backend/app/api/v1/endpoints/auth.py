@@ -139,6 +139,23 @@ async def get_current_user_profile(
     return current_user
 
 
+@router.get("/users", response_model=list[CAUserResponse])
+async def list_firm_users(
+    current_user: CAUser = Depends(get_current_ca_user),
+    session: AsyncSession = Depends(get_db),
+):
+    """List all users in the current CA Firm. Only accessible to OWNER and ADMIN."""
+    if current_user.role not in [UserRole.OWNER, UserRole.ADMIN]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only firm Owners and Admins can view the team list."
+        )
+    
+    user_repo = CAUserRepository(session)
+    users = await user_repo.get_users_by_firm(current_user.firm_id)
+    return users
+
+
 @router.put("/users/{target_user_id}/role", response_model=CAUserResponse)
 async def update_user_role(
     target_user_id: uuid.UUID,
@@ -199,3 +216,52 @@ async def remove_team_member(
     await session.delete(target_user)
     await session.commit()
     return None
+
+from app.domain.auth.models import Tenant
+from pydantic import BaseModel
+
+class TenantResponse(BaseModel):
+    id: uuid.UUID
+    gstin: str
+    legal_name: str
+    
+    class Config:
+        from_attributes = True
+
+class TenantCreate(BaseModel):
+    gstin: str
+    legal_name: str
+
+@router.get("/tenants", response_model=list[TenantResponse])
+async def list_firm_tenants(
+    current_user: CAUser = Depends(get_current_ca_user),
+    session: AsyncSession = Depends(get_db),
+):
+    """List all Client Companies (Tenants) for the CA Firm."""
+    result = await session.execute(
+        select(Tenant).where(Tenant.firm_id == current_user.firm_id)
+    )
+    return result.scalars().all()
+
+@router.post("/tenants", response_model=TenantResponse)
+async def create_tenant(
+    payload: TenantCreate,
+    current_user: CAUser = Depends(get_current_ca_user),
+    session: AsyncSession = Depends(get_db),
+):
+    """Create a new Client Company (Tenant) for the CA Firm."""
+    existing = await session.execute(
+        select(Tenant).where(Tenant.gstin == payload.gstin)
+    )
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Tenant with this GSTIN already exists.")
+        
+    tenant = Tenant(
+        firm_id=current_user.firm_id,
+        gstin=payload.gstin,
+        legal_name=payload.legal_name
+    )
+    session.add(tenant)
+    await session.commit()
+    await session.refresh(tenant)
+    return tenant

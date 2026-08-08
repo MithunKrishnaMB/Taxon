@@ -52,3 +52,45 @@ class ErpInvoiceRepository(BaseRepository[ErpInvoice]):
 class ImsReconciliationRepository(BaseRepository[ImsReconciliation]):
     def __init__(self, session: AsyncSession):
         super().__init__(ImsReconciliation, session)
+
+    async def get_reconciliations_for_tenant(self, tenant_id: uuid.UUID) -> Sequence[dict]:
+        from sqlalchemy.orm import aliased
+        
+        # We need to join ErpInvoice to filter by tenant and get doc_no/amount, 
+        # and Gstr2bInvoice for supplier_gstin
+        query = (
+            select(
+                ImsReconciliation.id,
+                ImsReconciliation.status,
+                ImsReconciliation.cgst_17_5_flag,
+                ErpInvoice.doc_no.label("invoice_number"),
+                ErpInvoice.amount.label("amount"),
+                ErpInvoice.gst_amount.label("gst_amount"),
+                Gstr2bInvoice.supplier_gstin.label("supplier_gstin"),
+            )
+            .join(ErpInvoice, ImsReconciliation.erp_id == ErpInvoice.id)
+            .outerjoin(Gstr2bInvoice, ImsReconciliation.gstr2b_id == Gstr2bInvoice.id)
+            .where(ErpInvoice.tenant_id == tenant_id)
+        )
+        
+        result = await self.session.execute(query)
+        rows = result.all()
+        
+        res = []
+        for row in rows:
+            reasoning = None
+            if row.cgst_17_5_flag:
+                reasoning = "Blocked under Section 17(5) - Ineligible ITC"
+            elif row.status == "REJECT":
+                reasoning = "Invoice metadata mismatch or missing in GSTR-2B"
+            
+            res.append({
+                "id": row.id,
+                "invoice_number": row.invoice_number,
+                "supplier_gstin": row.supplier_gstin,
+                "amount": row.amount,
+                "gst_amount": row.gst_amount,
+                "status": row.status,
+                "ai_reasoning": reasoning
+            })
+        return res

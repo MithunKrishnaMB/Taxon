@@ -34,3 +34,16 @@ class ReconciliationResponse(BaseModel):
 
     class Config:
         from_attributes = True  # Allows Pydantic to read SQLAlchemy ORM objects directly
+
+
+class ReconciliationListResponse(BaseModel):
+    id: uuid.UUID
+    invoice_number: str
+    supplier_gstin: str | None
+    amount: Decimal
+    gst_amount: Decimal
+    status: ReconStatus
+    ai_reasoning: str | None
+    
+    class Config:
+        from_attributes = True

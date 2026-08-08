@@ -2,12 +2,14 @@
 from fastapi import APIRouter
 from app.api.v1.endpoints import (
     auth,
+    tenants,
     ims_recon,
     ingestion,
     audit_log,
     export,
     tds_align,
     tally_bridge,
+    dashboard,
 )
 
 api_router = APIRouter()
@@ -15,6 +17,9 @@ api_router = APIRouter()
 # 1. Identity & Security Layer
 api_router.include_router(
     auth.router, prefix="/auth", tags=["Authentication & CA Firm Identity"]
+)
+api_router.include_router(
+    tenants.router, prefix="/tenants", tags=["Client Workspaces"]
 )
 
 # 2. Bulk ETL & File Ingestion
@@ -41,4 +46,7 @@ api_router.include_router(
 )
 api_router.include_router(
     tally_bridge.router, prefix="/tally", tags=["Tally-Bridge Orchestrator"]
+)
+api_router.include_router(
+    dashboard.router, prefix="/dashboard", tags=["Dashboard Metrics"]
 )

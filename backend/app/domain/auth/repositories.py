@@ -1,3 +1,5 @@
+import uuid
+from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,3 +27,9 @@ class CAUserRepository(BaseRepository[CAUser]):
         query = select(CAUser).where(CAUser.email == email)
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_users_by_firm(self, firm_id: uuid.UUID) -> Sequence[CAUser]:
+        """Fetch all users belonging to a specific CA Firm."""
+        query = select(CAUser).where(CAUser.firm_id == firm_id)
+        result = await self.session.execute(query)
+        return result.scalars().all()

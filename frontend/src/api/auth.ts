@@ -1,6 +1,5 @@
 import { apiClient } from './client';
 
-// 1. TypeScript Interfaces (Matching our FastAPI Schemas)
 export interface CAUser {
     id: string;
     firm_id: string;
@@ -17,15 +16,10 @@ export interface TokenResponse {
     role: string;
 }
 
-// 2. API Functions
 export const authApi = {
-    /**
-     * Logs in a user. 
-     * Note: Our FastAPI backend expects OAuth2 Form Data, not JSON!
-     */
     login: async (email: string, password: string): Promise<TokenResponse> => {
         const formData = new URLSearchParams();
-        formData.append('username', email); // OAuth2 expects 'username'
+        formData.append('username', email);
         formData.append('password', password);
 
         const response = await apiClient.post<TokenResponse>('/auth/login', formData, {
@@ -36,11 +30,32 @@ export const authApi = {
         return response.data;
     },
 
-    /**
-     * Fetches the profile of the currently logged-in CA.
-     */
     getMe: async (): Promise<CAUser> => {
         const response = await apiClient.get<CAUser>('/auth/me');
         return response.data;
+    },
+
+    registerFirm: async (data: any): Promise<any> => {
+        const response = await apiClient.post('/auth/register-firm', data);
+        return response.data;
+    },
+
+    registerUser: async (data: any): Promise<any> => {
+        const response = await apiClient.post('/auth/register-user', data);
+        return response.data;
+    },
+
+    getUsers: async (): Promise<CAUser[]> => {
+        const response = await apiClient.get<CAUser[]>('/auth/users');
+        return response.data;
+    },
+
+    updateRole: async (userId: string, newRole: string): Promise<CAUser> => {
+        const response = await apiClient.put<CAUser>(`/auth/users/${userId}/role`, { new_role: newRole });
+        return response.data;
+    },
+
+    removeUser: async (userId: string): Promise<void> => {
+        await apiClient.delete(`/auth/users/${userId}`);
     },
 };

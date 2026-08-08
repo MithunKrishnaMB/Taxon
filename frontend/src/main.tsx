@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
 import { AuthProvider } from './store/AuthContext'
+import { TenantProvider } from './store/TenantContext'
 import './index.css'
 
 // Create a client for fetching data and polling progress bars
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <App />
+          <TenantProvider>
+            <App />
+          </TenantProvider>
         </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>

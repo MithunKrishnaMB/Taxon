@@ -16,7 +16,7 @@ class AuditOverrideRequest(BaseModel):
     entity_id: str = Field(
         ...,
         example="INV-2026-00001",
-        description="Invoice number, PAN, or target document identifier",
+        description="Invoice number, PAN or target document identifier",
     )
     old_state: dict[str, Any] = Field(
         ...,

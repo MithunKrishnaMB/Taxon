@@ -9,7 +9,7 @@ class GstnImsActionItem(BaseModel):
     irn: str | None = Field(None, description="Invoice Reference Number (if e-Invoiced)")
     action: str = Field(
         ...,
-        description="Statutory Action: 'ACCEPT', 'REJECT', or 'PENDING'",
+        description="Statutory Action: 'ACCEPT', 'REJECT' or 'PENDING'",
     )
     reason_code: str | None = Field(
         None,

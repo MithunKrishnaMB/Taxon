@@ -30,7 +30,7 @@ class AuditLog(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
     )
-    # Multi-tenant isolation: Which Firm, which Client Company, and WHICH Accountant?
+    # Multi-tenant isolation: Which Firm, which Client Company and WHICH Accountant?
     firm_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("ca_firms.id", ondelete="CASCADE"),

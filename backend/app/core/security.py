@@ -40,15 +40,10 @@ def create_access_token(
     user_id: uuid.UUID,
     firm_id: uuid.UUID,
     email: str,
+    role: str,  # <-- NEW: Accept the role
     expires_delta: datetime.timedelta | None = None,
 ) -> str:
-    """Generate a signed JSON Web Token (JWT) access badge.
-
-    What it does:
-    1. Creates a payload containing user ID ('sub'), CA Firm ID ('firm_id') and email.
-    2. Adds an expiration timestamp ('exp').
-    3. Cryptographically signs the payload using our project's SECRET_KEY.
-    """
+    """Generate a signed JSON Web Token (JWT) access badge."""
     if expires_delta:
         expire = datetime.datetime.now(datetime.timezone.utc) + expires_delta
     else:
@@ -60,6 +55,7 @@ def create_access_token(
         "sub": str(user_id),
         "firm_id": str(firm_id),
         "email": email,
+        "role": role,  #Embed the role into the tamper-proof token
         "exp": expire,
     }
 

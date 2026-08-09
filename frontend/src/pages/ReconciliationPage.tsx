@@ -86,15 +86,6 @@ export const ReconciliationPage: React.FC = () => {
         ? filteredRecons.filter(r => r.status !== 'PENDING')
         : filteredRecons
     ).sort((a, b) => a.invoice_number.localeCompare(b.invoice_number));
-
-    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.checked) {
-            setSelectedIds(new Set(filteredRecons.map(r => r.id)));
-        } else {
-            setSelectedIds(new Set());
-        }
-    };
-
     const handleSelectRow = (id: string) => {
         const newSelected = new Set(selectedIds);
         if (newSelected.has(id)) {
@@ -104,24 +95,6 @@ export const ReconciliationPage: React.FC = () => {
         }
         setSelectedIds(newSelected);
     };
-
-    const handleOverrideClick = (recon: Reconciliation) => {
-        setReconToOverride(recon);
-        // Default to the opposite of the current status for convenience
-        setNewStatus(recon.status === 'REJECT' ? 'ACCEPT' : recon.status === 'ACCEPT' ? 'REJECT' : 'ACCEPT');
-        setIsOverrideModalOpen(true);
-    };
-
-    const confirmOverride = () => {
-        if (reconToOverride && overrideReason) {
-            overrideMutation.mutate({
-                id: reconToOverride.id,
-                status: newStatus,
-                reasoning: overrideReason
-            });
-        }
-    };
-
     if (!selectedTenant) {
         return (
             <div className="w-full flex flex-col items-center justify-center min-h-[calc(100vh-160px)] p-8">
@@ -156,14 +129,14 @@ export const ReconciliationPage: React.FC = () => {
             )}
 
             {/* Main Data Card */}
-            <div className="bg-surface-bright rounded-lg border border-border-muted flex flex-col">
+            <div className="bg-surface-bright rounded-xl border border-border-muted flex flex-col">
                 <div className="p-4 border-b border-border-muted flex flex-col sm:flex-row justify-between items-center gap-4 bg-bg-subtle/50 rounded-t-lg">
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                         <div className={`relative w-full sm:w-72 ${filteredRecons.length === 0 && searchQuery === '' ? 'opacity-50' : ''}`}>
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
                             <input
                                 type="text"
-                                className="w-full pl-9 pr-4 py-1.5 bg-surface-container-lowest border border-border-muted rounded text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-primary transition-shadow disabled:cursor-not-allowed"
+                                className="w-full pl-9 pr-4 py-1.5 bg-surface-container-lowest border border-border-muted rounded-lg text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-primary transition-shadow disabled:cursor-not-allowed"
                                 placeholder="Search Invoice or GSTIN..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -171,7 +144,7 @@ export const ReconciliationPage: React.FC = () => {
                             />
                         </div>
                         <select
-                            className="bg-surface-container-lowest border border-border-muted rounded py-1.5 px-3 text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer disabled:opacity-50 w-full sm:w-auto"
+                            className="bg-surface-container-lowest border border-border-muted rounded-lg py-1.5 px-3 text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer disabled:opacity-50 w-full sm:w-auto"
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value as any)}
                             disabled={reconciliations.length === 0}
@@ -187,7 +160,7 @@ export const ReconciliationPage: React.FC = () => {
                             <div className="flex items-center gap-3 mr-2">
                                 <span className="font-medium text-primary">{selectedIds.size} selected</span>
                                 <button 
-                                    className="px-3 py-1 bg-primary-container text-on-primary rounded text-body-sm font-medium hover:bg-primary transition-colors cursor-pointer shadow-sm"
+                                    className="px-3 py-1 bg-primary-container text-on-primary rounded-lg text-body-sm font-medium hover:bg-primary transition-all duration-200 cursor-pointer shadow-sm"
                                     onClick={() => { setIsBulkAction(true); setIsOverrideModalOpen(true); }}
                                 >
                                     Bulk Action
@@ -237,9 +210,9 @@ export const ReconciliationPage: React.FC = () => {
                             <tbody className="font-table-data text-table-data text-on-surface divide-y divide-border-muted/50">
                                 {displayRecons.map(r => {
                                     const statusConfig = {
-                                        ACCEPT: { bg: 'bg-success-soft/10 text-success-soft border-success-soft/20', Icon: Info },
-                                        REJECT: { bg: 'bg-error-soft/10 text-error-soft border-error-soft/20', Icon: AlertTriangle },
-                                        PENDING: { bg: 'bg-warning-soft/10 text-warning-soft border-warning-soft/20', Icon: HelpCircle }
+                                        ACCEPT: { bg: 'bg-success-soft-bg text-success-soft border-success-soft/20', Icon: Info },
+                                        REJECT: { bg: 'bg-error-soft-bg text-error-soft border-error-soft/20', Icon: AlertTriangle },
+                                        PENDING: { bg: 'bg-warning-soft-bg text-warning-soft border-warning-soft/20', Icon: HelpCircle }
                                     }[r.status];
                                     const isSelected = selectedIds.has(r.id);
 
@@ -301,7 +274,7 @@ export const ReconciliationPage: React.FC = () => {
             {/* Manual Override Modal */}
             {isOverrideModalOpen && (isBulkAction || reconToOverride) && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-on-background/20 backdrop-blur-sm transition-opacity">
-                    <div className="bg-surface-container-lowest w-full max-w-md rounded-lg shadow-2xl border border-border-muted flex flex-col m-4">
+                    <div className="bg-surface-container-lowest w-full max-w-md rounded-xl shadow-2xl border border-border-muted flex flex-col m-4">
                         <div className="px-6 py-4 border-b border-border-muted flex justify-between items-center">
                             <h3 className="font-headline-md text-body-lg font-semibold text-on-background">
                                 {isBulkAction ? 'Bulk Manual Override' : 'Manual Override'}
@@ -325,7 +298,7 @@ export const ReconciliationPage: React.FC = () => {
                             <div>
                                 <label className="block font-body-sm text-body-sm font-medium text-on-surface mb-1">New Statutory Status <span className="text-error-soft">*</span></label>
                                 <select
-                                    className="w-full bg-surface-container-lowest border border-border-muted rounded p-2 text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-primary transition-shadow cursor-pointer"
+                                    className="w-full bg-surface-container-lowest border border-border-muted rounded-lg p-2 text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-primary transition-shadow cursor-pointer"
                                     value={newStatus}
                                     onChange={(e) => setNewStatus(e.target.value as 'ACCEPT' | 'REJECT' | 'PENDING')}
                                 >
@@ -338,20 +311,20 @@ export const ReconciliationPage: React.FC = () => {
                             <div>
                                 <label className="block font-body-sm text-body-sm font-medium text-on-surface mb-1">Statutory Justification <span className="text-error-soft">*</span></label>
                                 <textarea
-                                    className="w-full bg-surface-container-lowest border border-border-muted rounded p-2 text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-primary transition-shadow resize-none h-24"
+                                    className="w-full bg-surface-container-lowest border border-border-muted rounded-lg p-2 text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-primary transition-shadow resize-none h-24"
                                     placeholder="Enter reason referencing specific sections (e.g., ITC claimed under proviso to Section 16(2)...)"
                                     value={overrideReason}
                                     onChange={(e) => setOverrideReason(e.target.value)}
                                 ></textarea>
                             </div>
                         </div>
-                        <div className="px-6 py-4 border-t border-border-muted flex justify-end gap-3 bg-bg-subtle rounded-b-lg">
-                            <button className="px-4 py-2 border border-border-muted text-on-surface rounded font-body-sm text-body-sm hover:bg-surface-container-high transition-colors cursor-pointer" onClick={() => setIsOverrideModalOpen(false)}>
+                        <div className="px-6 py-4 border-t border-border-muted flex justify-end gap-3 bg-bg-subtle rounded-b-xl">
+                            <button className="px-4 py-2 border border-border-muted text-on-surface rounded-lg font-body-sm text-body-sm hover:bg-surface-container-high transition-all duration-200 cursor-pointer" onClick={() => setIsOverrideModalOpen(false)}>
                                 Cancel
                             </button>
                             <button
                                 disabled={!overrideReason.trim() || overrideMutation.isPending || bulkOverrideMutation.isPending}
-                                className="px-4 py-2 bg-primary-container text-on-primary rounded font-body-sm text-body-sm hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
+                                className="px-4 py-2 bg-primary-container text-on-primary rounded-lg font-body-sm text-body-sm hover:bg-primary transition-all duration-200 disabled:opacity-50 cursor-pointer"
                                 onClick={() => {
                                     if (isBulkAction) {
                                         bulkOverrideMutation.mutate({ ids: Array.from(selectedIds), status: newStatus, reasoning: overrideReason });

@@ -15,7 +15,7 @@ class ErpInvoiceRepository(BaseRepository[ErpInvoice]):
     async def get_unreconciled_erp_invoices(
         self, tenant_id: uuid.UUID
     ) -> Sequence[ErpInvoice]:
-        """Fetch all ERP invoices that have not been reconciled yet, OR are still PENDING."""
+        """Fetch all ERP invoices that have not been reconciled yet or are still PENDING."""
         from sqlalchemy import or_
         from app.domain.ims_recon.models import ReconStatus
         query = (

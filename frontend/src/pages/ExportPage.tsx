@@ -94,7 +94,7 @@ export const ExportPage: React.FC = () => {
                         <p className="text-[11px] text-secondary mt-1">Format: MMYYYY (e.g., 072026 for July 2026)</p>
                     </div>
 
-                    <div className="flex items-center gap-2 p-3 bg-bg-subtle rounded-lg border border-border-muted text-body-sm text-secondary">
+                    <div className="flex items-center gap-2 p-3 bg-bg-subtle rounded-xl border border-border-muted text-body-sm text-secondary">
                         <FileJson className="w-4 h-4 shrink-0" />
                         <span>Output: <code className="font-mono text-primary text-[12px]">{selectedTenant.gstin}_IMS_{returnPeriod}.json</code></span>
                     </div>

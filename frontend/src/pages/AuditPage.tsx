@@ -4,7 +4,6 @@ import { auditApi } from '../api/audit';
 import { useTenant } from '../store/TenantContext';
 import {
     BookOpenCheck,
-    Download,
     History,
     Pencil,
     CloudUpload,
@@ -46,7 +45,7 @@ export const AuditPage: React.FC = () => {
             </div>
             
             {/* Data Table Container */}
-            <div className="bg-surface-container-lowest border border-border-muted rounded-lg flex flex-col shadow-sm flex-1 min-h-0">
+            <div className="bg-surface-container-lowest border border-border-muted rounded-xl flex flex-col shadow-sm flex-1 min-h-0">
                 <div className="flex-1 overflow-auto">
                     {isLoading ? (
                         <div className="p-8 text-center text-secondary">Loading audit logs...</div>
@@ -71,14 +70,14 @@ export const AuditPage: React.FC = () => {
                                     const dateObj = new Date(log.created_at);
 
                                     let ActionIcon = Pencil;
-                                    let actionColor = "text-warning-soft bg-warning-soft/10 border-warning-soft/20";
+                                    let actionColor = "text-warning-soft bg-warning-soft-bg border-warning-soft/20";
 
                                     if (log.action_type.includes('UPLOAD') || log.action_type.includes('INGESTION')) {
                                         ActionIcon = CloudUpload;
                                         actionColor = "text-secondary bg-surface-container-high border-border-muted";
                                     } else if (log.action_type.includes('OVERRIDE')) {
                                         ActionIcon = Pencil;
-                                        actionColor = "text-error-soft bg-error-soft/10 border-error-soft/20";
+                                        actionColor = "text-error-soft bg-error-soft-bg border-error-soft/20";
                                     }
 
                                     return (
@@ -101,14 +100,14 @@ export const AuditPage: React.FC = () => {
                                                     {log.old_state && log.old_state !== "None" ? (
                                                         <>
                                                             <span className="text-secondary line-through">
-                                                                {typeof log.old_state === 'object' ? (log.old_state.status || JSON.stringify(log.old_state)) : log.old_state}
+                                                                {typeof log.old_state === 'object' ? ((log.old_state as any).status || JSON.stringify(log.old_state)) : log.old_state}
                                                             </span>
                                                             <ArrowRight className="w-3.5 h-3.5 text-secondary" />
                                                         </>
                                                     ) : null}
                                                     {log.new_state && log.new_state !== "None" ? (
                                                         <span className="text-on-surface font-medium">
-                                                            {typeof log.new_state === 'object' ? (log.new_state.status || JSON.stringify(log.new_state)) : log.new_state}
+                                                            {typeof log.new_state === 'object' ? ((log.new_state as any).status || JSON.stringify(log.new_state)) : log.new_state}
                                                         </span>
                                                     ) : null}
                                                 </div>

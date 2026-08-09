@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useAuth } from '../store/AuthContext';
 import { useTenant } from '../store/TenantContext';
 import { dashboardApi } from '../api/dashboard';
-import { ingestionApi } from '../api/ingestion';
+import { ingestionApi, type IngestionJob } from '../api/ingestion';
 import { tenantApi } from '../api/tenant';
 import {
     CheckCheck,
@@ -37,8 +37,9 @@ export const DashboardPage: React.FC = () => {
             setNewGstin('');
             setCreateError('');
         },
-        onError: (err: any) => {
-            setCreateError(err.response?.data?.detail || 'Failed to create client workspace.');
+        onError: (err: { response?: { data?: { detail?: string } } } | unknown) => {
+            const error = err as { response?: { data?: { detail?: string } } };
+            setCreateError(error.response?.data?.detail || 'Failed to create client workspace.');
         }
     });
 
@@ -61,7 +62,7 @@ export const DashboardPage: React.FC = () => {
         refetchInterval: 5000
     });
 
-    const activeJobs = jobs.filter((j: any) => ['QUEUED', 'PARSING', 'EMBEDDING', 'RECONCILING'].includes(j.status));
+    const activeJobs = jobs.filter((j: IngestionJob) => ['QUEUED', 'PARSING', 'EMBEDDING', 'RECONCILING'].includes(j.status));
     
     if (!selectedTenant) {
         return (

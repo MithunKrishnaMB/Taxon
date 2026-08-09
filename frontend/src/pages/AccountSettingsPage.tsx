@@ -34,7 +34,7 @@ export const AccountSettingsPage: React.FC = () => {
 
                             <div className="space-y-1.5">
                                 <label className="block text-body-sm font-medium text-on-surface">Full Name</label>
-                                <div className="w-full bg-bg-subtle border border-border-muted rounded-md px-3 py-2 text-body-sm font-body-sm text-on-surface">
+                                <div className="w-full bg-bg-subtle border border-border-muted rounded-lg px-3 py-2 text-body-sm font-body-sm text-on-surface">
                                     {user?.full_name}
                                 </div>
                             </div>
@@ -43,14 +43,14 @@ export const AccountSettingsPage: React.FC = () => {
                         <div className="space-y-6">
                             <div className="space-y-1.5">
                                 <label className="block text-body-sm font-medium text-on-surface">Email Address</label>
-                                <div className="w-full bg-bg-subtle border border-border-muted rounded-md px-3 py-2 text-body-sm font-body-sm text-on-surface">
+                                <div className="w-full bg-bg-subtle border border-border-muted rounded-lg px-3 py-2 text-body-sm font-body-sm text-on-surface">
                                     {user?.email}
                                 </div>
                             </div>
 
                             <div className="space-y-1.5">
                                 <label className="block text-body-sm font-medium text-on-surface">Role</label>
-                                <div className="w-full bg-bg-subtle border border-border-muted rounded-md px-3 py-2 text-body-sm font-body-sm text-secondary cursor-not-allowed font-label-caps inline-flex items-center gap-2">
+                                <div className="w-full bg-bg-subtle border border-border-muted rounded-lg px-3 py-2 text-body-sm font-body-sm text-secondary cursor-not-allowed font-label-caps inline-flex items-center gap-2">
                                     <BadgeCheck className="w-4 h-4" />
                                     {user?.role}
                                 </div>
@@ -69,14 +69,14 @@ export const AccountSettingsPage: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="space-y-1.5">
                             <label className="block text-body-sm font-medium text-on-surface">Firm Name</label>
-                            <div className="w-full bg-bg-subtle border border-border-muted rounded-md px-3 py-2 text-body-sm font-body-sm text-secondary flex items-center gap-2">
+                            <div className="w-full bg-bg-subtle border border-border-muted rounded-lg px-3 py-2 text-body-sm font-body-sm text-secondary flex items-center gap-2">
                                 <Building2 className="w-4 h-4" />
                                 Taxon Workspace
                             </div>
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-body-sm font-medium text-on-surface">Firm ID (UUID)</label>
-                            <div className="w-full bg-bg-subtle border border-border-muted rounded-md px-3 py-2 text-body-sm font-body-sm text-secondary font-mono text-[12px]">
+                            <div className="w-full bg-bg-subtle border border-border-muted rounded-lg px-3 py-2 text-body-sm font-body-sm text-secondary font-mono text-[12px]">
                                 {user?.firm_id}
                             </div>
                         </div>

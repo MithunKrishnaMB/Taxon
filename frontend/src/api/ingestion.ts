@@ -5,7 +5,7 @@ export interface IngestionJob {
     tenant_id: string;
     file_name: string;
     file_type: string;
-    status: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+    status: 'QUEUED' | 'PARSING' | 'EMBEDDING' | 'PROCESSING' | 'RECONCILING' | 'COMPLETED' | 'FAILED';
     total_rows: number;
     processed_rows: number;
     error_message?: string;

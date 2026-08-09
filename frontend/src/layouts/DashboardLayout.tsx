@@ -64,7 +64,7 @@ export const DashboardLayout: React.FC = () => {
     return (
         <div className="bg-surface text-on-surface font-body-md min-h-screen w-full antialiased flex flex-col">
             {/* TopAppBar (Fixed Full Width) */}
-            <header className="flex justify-between items-center h-16 px-gutter w-full fixed top-0 z-50 bg-surface-container-lowest border-b border-border-muted shadow-sm">
+            <header className="flex justify-between items-center h-16 px-gutter w-full fixed top-0 z-50 bg-surface-glass backdrop-blur-xl border-b border-border-muted shadow-sm">
                 {/* Left: Hamburger & Brand */}
                 <div className="flex items-center gap-4">
                     <button
@@ -234,14 +234,14 @@ export const DashboardLayout: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsCreateModalOpen(false)}
-                                    className="px-4 py-2 border border-border-muted text-on-surface rounded-lg font-body-sm hover:bg-surface-container-high transition-colors cursor-pointer"
+                                    className="px-4 py-2 border border-border-muted text-on-surface rounded-lg font-body-sm hover:bg-surface-container-high transition-all duration-200 cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={createTenantMutation.isPending || !newLegalName.trim() || !newGstin.trim()}
-                                    className="px-5 py-2 bg-primary-container text-on-primary rounded-lg font-body-sm font-medium hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer flex items-center gap-2 shadow-sm"
+                                    className="px-5 py-2 bg-primary-container text-on-primary rounded-lg font-body-sm font-medium hover:bg-primary transition-all duration-200 disabled:opacity-50 cursor-pointer flex items-center gap-2 shadow-sm"
                                 >
                                     {createTenantMutation.isPending ? (
                                         <><Loader2 className="w-4 h-4 animate-spin" /> Creating...</>

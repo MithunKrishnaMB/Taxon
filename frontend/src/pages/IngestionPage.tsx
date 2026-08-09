@@ -1,11 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ingestionApi } from '../api/ingestion';
+import { ingestionApi, type IngestionJob } from '../api/ingestion';
 import { useTenant } from '../store/TenantContext';
 import { 
     UploadCloud, 
-    FileSpreadsheet, 
-    FileJson, 
+    FileSpreadsheet,
+    FileJson,
     Loader2, 
     FileText, 
     CheckCircle2, 
@@ -46,16 +46,17 @@ export const IngestionPage: React.FC = () => {
             
             queryClient.invalidateQueries({ queryKey: ['ingestionJobs', selectedTenant.id] });
             
-        } catch (err: any) {
-            setUploadError(err.response?.data?.detail || err.message || "Failed to upload file");
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { detail?: string } }, message?: string };
+            setUploadError(error.response?.data?.detail || error.message || "Failed to upload file");
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
-    const activeJobs = jobs.filter((j: any) => ['QUEUED', 'PARSING', 'EMBEDDING', 'RECONCILING'].includes(j.status));
-    const pastJobs = jobs.filter((j: any) => ['COMPLETED', 'FAILED'].includes(j.status));
+    const activeJobs = jobs.filter((j: IngestionJob) => ['QUEUED', 'PARSING', 'EMBEDDING', 'RECONCILING'].includes(j.status));
+    const pastJobs = jobs.filter((j: IngestionJob) => ['COMPLETED', 'FAILED'].includes(j.status));
 
     return (
         <div className="flex-1 w-full">
@@ -144,7 +145,7 @@ export const IngestionPage: React.FC = () => {
                                 {activeJobs.map(job => {
                                     const percent = job.total_rows > 0 ? Math.round((job.processed_rows / job.total_rows) * 100) : 0;
                                     return (
-                                        <div key={job.job_id} className="bg-surface-container-lowest border border-border-muted rounded-lg p-4 shadow-sm flex flex-col gap-3">
+                                        <div key={job.id} className="bg-surface-container-lowest border border-border-muted rounded-lg p-4 shadow-sm flex flex-col gap-3">
                                             <div className="flex justify-between items-center">
                                                 <div className="flex items-center gap-3">
                                                     <FileText className="w-5 h-5 text-primary" />
@@ -172,7 +173,7 @@ export const IngestionPage: React.FC = () => {
                     {/* History Table */}
                     <div>
                         <h3 className="font-label-caps text-label-caps text-secondary mb-4 uppercase tracking-wider">Recent Ingestion History</h3>
-                        <div className="bg-surface-container-lowest border border-border-muted rounded-lg shadow-sm overflow-hidden">
+                        <div className="bg-surface-container-lowest border border-border-muted rounded-xl shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse min-w-[600px]">
                                     <thead>
@@ -189,8 +190,8 @@ export const IngestionPage: React.FC = () => {
                                                 <td colSpan={4} className="py-8 text-center text-secondary">No history found for this client.</td>
                                             </tr>
                                         ) : (
-                                            pastJobs.map((job: any) => (
-                                                <tr key={job.job_id} className="border-b border-border-muted hover:bg-surface-container-low transition-colors">
+                                            pastJobs.map((job: IngestionJob) => (
+                                                <tr key={job.id} className="border-b border-border-muted hover:bg-surface-container-low transition-colors">
                                                     <td className="py-3 px-4 flex items-center gap-2">
                                                         <FileText className="w-4 h-4 text-outline" />
                                                         {job.file_name}
@@ -199,12 +200,12 @@ export const IngestionPage: React.FC = () => {
                                                     <td className="py-3 px-4 text-right">{job.total_rows.toLocaleString()}</td>
                                                     <td className="py-3 px-4">
                                                         {job.status === 'COMPLETED' ? (
-                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-success-soft/10 text-success-soft">
+                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-success-soft-bg text-success-soft">
                                                                 <CheckCircle2 className="w-3 h-3" />
                                                                 COMPLETED
                                                             </span>
                                                         ) : (
-                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-error-soft/10 text-error-soft" title={job.error_message}>
+                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-error-soft-bg text-error-soft" title={job.error_message}>
                                                                 <XCircle className="w-3 h-3" />
                                                                 FAILED
                                                             </span>

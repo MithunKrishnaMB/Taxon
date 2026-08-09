@@ -76,7 +76,7 @@ export const TeamPage: React.FC = () => {
             </div>
 
             {/* Filters & Search Bar */}
-            <div className="bg-surface-container-lowest border border-border-muted rounded-lg p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="bg-surface-container-lowest border border-border-muted rounded-xl p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <div className={`flex-1 w-full max-w-md relative group ${users.length === 0 ? 'opacity-50' : ''}`}>
                     <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" />
                     <input
@@ -104,7 +104,7 @@ export const TeamPage: React.FC = () => {
             </div>
 
             {/* Data Table Card */}
-            <div className="bg-surface-container-lowest border border-border-muted rounded-lg overflow-hidden relative">
+            <div className="bg-surface-container-lowest border border-border-muted rounded-xl overflow-hidden relative">
                 {/* Table */}
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -181,10 +181,10 @@ export const TeamPage: React.FC = () => {
                                 Are you sure you want to remove <strong>{userToRemove.full_name}</strong>? They will immediately lose access to all firm workspaces and reconciliation data. This action cannot be undone.
                             </p>
                             <div className="flex gap-3 justify-end mt-4">
-                                <button onClick={() => setIsRemoveModalOpen(false)} className="px-4 py-2 rounded font-body-sm font-medium text-secondary hover:bg-surface-container border border-transparent transition-colors cursor-pointer">
+                                <button onClick={() => setIsRemoveModalOpen(false)} className="px-4 py-2 rounded-lg font-body-sm font-medium text-secondary hover:bg-surface-container border border-transparent transition-all duration-200 cursor-pointer">
                                     Cancel
                                 </button>
-                                <button onClick={confirmRemove} className="px-4 py-2 rounded font-body-sm font-medium bg-error text-on-error hover:bg-error/90 shadow-sm transition-colors cursor-pointer">
+                                <button onClick={confirmRemove} className="px-4 py-2 rounded-lg font-body-sm font-medium bg-error text-on-error hover:bg-error/90 shadow-sm transition-all duration-200 cursor-pointer">
                                     Remove User
                                 </button>
                             </div>

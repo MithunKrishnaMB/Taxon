@@ -1,81 +1,43 @@
-# Design Specification: Taxon Enterprise CA Compliance Platform
+# Taxon – Enterprise CA Compliance Platform
 
-## 1. Design Philosophy: "Compliance Minimalist"
-The Taxon interface is designed for high-stakes financial compliance. It prioritizes **trust, clarity and precision**. The aesthetic is modern and minimalist (similar to Stripe or Vercel), utilizing generous whitespace, subtle borders and a high-contrast type scale to reduce cognitive load for Chartered Accountants managing complex data.
+## Overview
 
----
+Taxon is a multi-tenant enterprise compliance platform that turns raw financial data into statutory reconciliation and audit-ready exports.
+It uses distinct domain modules:
 
-## 2. Visual Identity & Brand
-- **Logo:** A professional mark combining a document icon with a rising chart trend line.
-- **Brand Colors:**
-  - **Primary (Accent):** `#0052ff` (Soft Blue) - Used for primary actions (buttons), progress bars and active navigation states.
-  - **Success:** Soft Green (e.g., `#e6f4ea` background with `#1e8e3e` text/icon).
-  - **Error:** Light Red (e.g., `#fce8e6` background with `#d93025` text/icon).
-  - **Warning/Pending:** Muted Amber (e.g., `#fef7e0` background with `#f9ab00` text/icon).
+- **Ingestion** → extracts and parses internal ERP ledgers and government GSTR-2B JSON statements.
+- **IMS Recon** → evaluates compliance records and reconciles invoices using AI.
+- **Audit Log** → maintains an immutable chronological ledger of all manual overrides and justifications.
+- **Tally Bridge & TDS Align** → manages external accounting software integrations and complex tax deduction logic.
 
----
+The system is **stateful**, **multi-tenant** and streams progress via client-side **polling**.
 
-## 3. Color Palette & Theming
-Built on a light-mode foundation with high readability.
+## Tech Stack
 
-| Token | Value | Usage |
-| :--- | :--- | :--- |
-| **Surface (Default)** | `#fbf8ff` | Main background of the application shell. |
-| **Surface Container** | `#ffffff` | Background for cards, tables and whiteboards. |
-| **Surface Dim** | `#d9d9e7` | Subtle contrast for secondary backgrounds. |
-| **Text Primary** | `#1a1a1a` | Headings and primary body copy. |
-| **Text Secondary** | `#4a4a4a` | Labels, descriptions and metadata. |
-| **Border Muted** | `#e5e7eb` | Dividers and input borders. |
+- **Backend:** Python, FastAPI, SQLAlchemy, Alembic, Pydantic, LangChain
+- **Frontend:** React, Vite, TypeScript, TailwindCSS, TanStack Query, Lucide React
+- **Models:**
+  - Reconciliation AI → Google Gemini API (google-genai)
 
----
+**Why:** High throughput, robust type-safety for complex financial data and scalable relational database models essential for compliance.
 
-## 4. Typography (Hanken Grotesk)
-A clean, geometric sans-serif that balances modernism with corporate authority.
+## Architecture Decisions
 
-- **Headlines (H1/H2):** Bold weight, tight tracking, `#1a1a1a`. Used for page titles (e.g., "Statutory Audit Trail").
-- **Body:** Regular weight, `14px` or `16px`. Optimized for data density in tables.
-- **Labels:** Semi-bold, `12px` or `13px`, often in all-caps for navigation or secondary badges.
+- **Relational Database (SQLAlchemy/PostgreSQL/SQLite)** → strict data integrity and relationships required for compliance audits.
+- **Polling (TanStack Query)** → simpler implementation for background job progress (5-second intervals), avoids WebSocket overhead.
+- **Multi-tenancy** → strict data isolation per CA client workspace to prevent data leakage.
+- **AI Integration (Gemini)** → flexible reasoning capabilities for evaluating complex statutory rules like Section 17(5).
 
----
+## Reliability Strategy
 
-## 5. Layout Architecture (The Shell)
-The application uses a persistent **Global Shell** to maintain context.
+- **Circuit Breaker Pattern** (via Tally Bridge) to prevent cascading failures on external integrations.
+- **Structured validation** across all data ingestion pipelines (Excel, CSV, JSON).
+- **Immutable Audit Trail** ensuring every manual override is tracked with a user-provided statutory justification.
+- **Strict RBAC (Role-Based Access Control)** limiting destructive actions (e.g., removing users) to `OWNER` and `ADMIN` roles.
+- **Background Job Processing** handling heavy file parsing and embedding to keep the API responsive.
 
-### A. Side Navigation (`SideNavBar`)
-- **Width:** `280px` (Fixed).
-- **Style:** Light gray background (`#f3f2ff`) with a subtle right border.
-- **Components:**
-  - Top: Logo and CA Firm Branding.
-  - Middle: Navigation links (Dashboard, Reconciliation, Ingestion, Audit, Export, Team) with Lucide icons.
-  - Bottom: Help Center and Logout.
+## Trade-offs
 
-### B. Top AppBar (`TopAppBar`)
-- **Style:** Glassmorphic / White background with blur effect.
-- **Components:**
-  - Left: Search bar (Global search).
-  - Center: **Client Workspace Dropdown** (Crucial for multi-tenant context switching).
-  - Right: Notification bell, Help, Settings icon and User Profile (Avatar + Role Badge).
-
----
-
-## 6. Component Patterns
-### Tables (High Density)
-- **Header:** Light gray background, uppercase labels, sticky position.
-- **Rows:** Hover states with subtle background change; standard height for readability.
-- **Status Badges:** Rounded pills with semantic background/text colors (e.g., `ACCEPT`, `REJECT`, `PENDING`).
-
-### Data Entry & Modals
-- **Inputs:** Soft gray borders (`rounded-lg`), clear focus states (`#0052ff` ring).
-- **Cards:** White background, minimal shadows (elevation 0 or 1), `rounded-xl` corners.
-
-### Interactive Elements
-- **Primary Buttons:** Solid `#0052ff`, white text, `rounded-lg`, smooth hover transition.
-- **Progress Bars:** Smooth animated bars showing `processed_rows / total_rows`.
-
----
-
-## 7. Technical Implementation Details
-- **Framework:** React + Tailwind CSS.
-- **Icons:** `lucide-react`.
-- **State Management:** Assume `@tanstack/react-query` for asynchronous operations (loaders/skeletons).
-- **RBAC:** Visual logic should account for 4 tiers: `OWNER`, `ADMIN`, `MANAGER`, `CLERK`. Restricted actions (e.g., "Remove User") should be hidden or disabled for lower roles.
+- **Polling instead of WebSockets** → introduces a slight delay in progress updates but reduces connection state management.
+- **AI-Driven Recon** → requires manual review (Overrides) for edge cases to ensure absolute compliance.
+- **Strict Multi-tenancy** → makes cross-tenant analytics more complex, as data is heavily siloed.

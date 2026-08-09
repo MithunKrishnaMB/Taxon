@@ -13,6 +13,7 @@ class IngestionStatus(str, enum.Enum):
     QUEUED = "QUEUED"          # File uploaded; waiting for background worker
     PARSING = "PARSING"        # Reading spreadsheet and checking GSTIN regex rules
     EMBEDDING = "EMBEDDING"    # Generating 1536-dim vector embeddings via Gemini
+    RECONCILING = "RECONCILING" # AI is evaluating the records
     COMPLETED = "COMPLETED"    # All rows successfully inserted into PostgreSQL
     FAILED = "FAILED"          # Job aborted due to corrupt file or schema mismatch
 

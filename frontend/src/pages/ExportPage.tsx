@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTenant } from '../store/TenantContext';
+import { dashboardApi } from '../api/dashboard';
 import { apiClient } from '../api/client';
-import { Download, FileJson, Loader2, PackageOpen } from 'lucide-react';
+import { Download, FileJson, Loader2, PackageOpen, AlertTriangle } from 'lucide-react';
 
 export const ExportPage: React.FC = () => {
     const { selectedTenant } = useTenant();
     const [returnPeriod, setReturnPeriod] = useState('072026');
     const [isGenerating, setIsGenerating] = useState(false);
     const [exportError, setExportError] = useState('');
+
+    const { data: dashboardData } = useQuery({
+        queryKey: ['dashboardStats', selectedTenant?.id],
+        queryFn: () => dashboardApi.getStats(selectedTenant!.id),
+        enabled: !!selectedTenant,
+    });
+
+    const hasNoData = !dashboardData || dashboardData.stats.total_invoices_reconciled === 0;
 
     const handleExport = async () => {
         if (!selectedTenant) return;
@@ -97,8 +107,12 @@ export const ExportPage: React.FC = () => {
 
                     <button
                         onClick={handleExport}
-                        disabled={isGenerating || !returnPeriod.trim()}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-primary-container text-on-primary rounded-lg font-body-md font-medium hover:bg-primary transition-colors disabled:opacity-50 shadow-sm cursor-pointer"
+                        disabled={isGenerating || !returnPeriod.trim() || hasNoData}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-body-md font-medium shadow-sm transition-colors ${
+                            hasNoData
+                                ? 'bg-surface-variant text-outline cursor-not-allowed'
+                                : 'bg-primary-container text-on-primary hover:bg-primary cursor-pointer disabled:opacity-50'
+                        }`}
                     >
                         {isGenerating ? (
                             <>
@@ -112,6 +126,12 @@ export const ExportPage: React.FC = () => {
                             </>
                         )}
                     </button>
+                    {hasNoData && (
+                        <div className="flex items-center gap-2 text-body-sm text-warning-soft mt-1">
+                            <AlertTriangle className="w-4 h-4 shrink-0" />
+                            <span>No reconciled records available to export for this period.</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

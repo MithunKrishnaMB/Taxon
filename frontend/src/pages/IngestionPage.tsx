@@ -54,8 +54,8 @@ export const IngestionPage: React.FC = () => {
         }
     };
 
-    const activeJobs = jobs.filter(j => j.status === 'PROCESSING' || j.status === 'QUEUED');
-    const pastJobs = jobs.filter(j => j.status === 'COMPLETED' || j.status === 'FAILED');
+    const activeJobs = jobs.filter((j: any) => ['QUEUED', 'PARSING', 'EMBEDDING', 'RECONCILING'].includes(j.status));
+    const pastJobs = jobs.filter((j: any) => ['COMPLETED', 'FAILED'].includes(j.status));
 
     return (
         <div className="flex-1 w-full">
@@ -144,7 +144,7 @@ export const IngestionPage: React.FC = () => {
                                 {activeJobs.map(job => {
                                     const percent = job.total_rows > 0 ? Math.round((job.processed_rows / job.total_rows) * 100) : 0;
                                     return (
-                                        <div key={job.id} className="bg-surface-container-lowest border border-border-muted rounded-lg p-4 shadow-sm flex flex-col gap-3">
+                                        <div key={job.job_id} className="bg-surface-container-lowest border border-border-muted rounded-lg p-4 shadow-sm flex flex-col gap-3">
                                             <div className="flex justify-between items-center">
                                                 <div className="flex items-center gap-3">
                                                     <FileText className="w-5 h-5 text-primary" />
@@ -159,7 +159,7 @@ export const IngestionPage: React.FC = () => {
                                                 ></div>
                                             </div>
                                             <div className="flex justify-between items-center text-body-sm text-secondary">
-                                                <span>{job.status === 'QUEUED' ? 'Waiting...' : 'Processing rows...'}</span>
+                                                <span>{job.status === 'QUEUED' ? 'Waiting...' : job.status === 'RECONCILING' ? 'AI Evaluating records...' : 'Parsing File...'}</span>
                                                 <span className="font-table-data">{job.processed_rows.toLocaleString()} / {job.total_rows.toLocaleString()} rows ({percent}%)</span>
                                             </div>
                                         </div>
@@ -189,13 +189,13 @@ export const IngestionPage: React.FC = () => {
                                                 <td colSpan={4} className="py-8 text-center text-secondary">No history found for this client.</td>
                                             </tr>
                                         ) : (
-                                            pastJobs.map(job => (
-                                                <tr key={job.id} className="border-b border-border-muted hover:bg-surface-container-low transition-colors">
+                                            pastJobs.map((job: any) => (
+                                                <tr key={job.job_id} className="border-b border-border-muted hover:bg-surface-container-low transition-colors">
                                                     <td className="py-3 px-4 flex items-center gap-2">
                                                         <FileText className="w-4 h-4 text-outline" />
                                                         {job.file_name}
                                                     </td>
-                                                    <td className="py-3 px-4 text-secondary">{new Date(job.created_at).toLocaleString()}</td>
+                                                    <td className="py-3 px-4 text-secondary">{job.created_at ? new Date(job.created_at).toLocaleDateString() : 'Just now'}</td>
                                                     <td className="py-3 px-4 text-right">{job.total_rows.toLocaleString()}</td>
                                                     <td className="py-3 px-4">
                                                         {job.status === 'COMPLETED' ? (

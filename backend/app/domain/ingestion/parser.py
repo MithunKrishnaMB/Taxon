@@ -156,3 +156,23 @@ def parse_statement_file(
         raise ValueError(
             f"Unsupported file format '{extension}'. Please upload .xlsx, .csv  or .json files."
         )
+
+def count_statement_rows(file_path: str) -> int:
+    """Quickly pre-count rows in a file so the progress bar works accurately."""
+    path = Path(file_path)
+    extension = path.suffix.lower()
+
+    if extension == ".xlsx":
+        wb = openpyxl.load_workbook(file_path, read_only=True)
+        sheet = wb.active
+        # max_row includes header, so subtract 1
+        return max(0, (sheet.max_row or 1) - 1)
+    elif extension == ".csv":
+        with open(file_path, mode="r", encoding="utf-8-sig") as f:
+            # count lines and subtract header
+            return max(0, sum(1 for _ in f) - 1)
+    elif extension == ".json":
+        with open(file_path, mode="r", encoding="utf-8") as f:
+            data = json.load(f)
+            return len(data) if isinstance(data, list) else 0
+    return 0

@@ -61,7 +61,7 @@ export const DashboardPage: React.FC = () => {
         refetchInterval: 5000
     });
 
-    const activeJobs = jobs.filter(j => j.status === 'PROCESSING' || j.status === 'QUEUED');
+    const activeJobs = jobs.filter((j: any) => ['QUEUED', 'PARSING', 'EMBEDDING', 'RECONCILING'].includes(j.status));
     
     if (!selectedTenant) {
         return (
@@ -134,6 +134,16 @@ export const DashboardPage: React.FC = () => {
                 <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">Welcome back, {user?.full_name?.split(' ')[0] || 'User'}.</h1>
                 <p className="font-body-md text-body-md text-on-surface-variant mt-1">Here is a high-level overview of your compliance operations for {selectedTenant.legal_name}.</p>
             </section>
+            
+            {activeJobs.length > 0 && (
+                <div className="mt-4 bg-primary-container/20 border border-primary/30 rounded-lg p-4 flex items-center gap-3">
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                    <div>
+                        <p className="font-medium text-primary">AI is currently evaluating compliance records in the background.</p>
+                        <p className="text-sm text-secondary">Dashboard statistics below will actively update as evaluation completes.</p>
+                    </div>
+                </div>
+            )}
 
             {/* Top Stat Cards (Bento style grid) */}
             <section className="grid grid-cols-1 md:grid-cols-3 gap-gutter mt-6">
@@ -230,7 +240,10 @@ export const DashboardPage: React.FC = () => {
                                                 )}
                                             </div>
                                         </div>
-                                        <p className="font-body-sm text-[12px] text-on-surface-variant">Processing {job.processed_rows.toLocaleString()} / {job.total_rows.toLocaleString()} rows...</p>
+                                        <p className="font-body-sm text-[12px] text-on-surface-variant">
+                                            {job.status === 'RECONCILING' ? 'AI Evaluating ' : 'Parsing '} 
+                                            {job.processed_rows.toLocaleString()} / {job.total_rows.toLocaleString()} rows...
+                                        </p>
                                     </div>
                                 );
                             })
@@ -265,7 +278,7 @@ export const DashboardPage: React.FC = () => {
                                     const dotColor = isError ? 'bg-error-soft' : isSuccess ? 'bg-primary' : 'bg-secondary';
                                     
                                     return (
-                                        <div key={activity.id} className={`relative z-10 flex gap-4 ${index < recentActivity.length - 1 ? 'pb-stack-md' : ''}`}>
+                                        <div key={activity.id || index} className={`relative z-10 flex gap-4 ${index < recentActivity.length - 1 ? 'pb-stack-md' : ''}`}>
                                             <div className={`w-2 h-2 rounded-full ${dotColor} mt-1.5 ring-4 ring-surface-container-lowest`}></div>
                                             <div className="flex-1">
                                                 <p className="font-body-sm text-body-sm text-on-surface">

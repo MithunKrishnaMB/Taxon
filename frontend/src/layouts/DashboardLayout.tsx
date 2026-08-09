@@ -76,7 +76,7 @@ export const DashboardLayout: React.FC = () => {
                     </button>
 
                     <NavLink to="/" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
-                        <img alt="Taxon Logo" className="h-10 w-auto object-contain" src="/logo.png" />
+                        <img alt="Taxon Logo" className="h-14 w-auto object-contain" src="/logo.png" />
                     </NavLink>
                 </div>
 

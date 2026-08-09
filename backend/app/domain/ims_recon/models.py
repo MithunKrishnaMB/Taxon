@@ -3,7 +3,7 @@ import uuid
 from decimal import Decimal
 # pyrefly: ignore [missing-import]
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Boolean, Enum, Float, ForeignKey, Index, Numeric, String
+from sqlalchemy import Boolean, Enum, Float, ForeignKey, Index, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -26,6 +26,7 @@ class ErpInvoice(Base):
         UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), index=True
     )
     doc_no: Mapped[str] = mapped_column(String(100), nullable=False)
+    supplier_gstin: Mapped[str | None] = mapped_column(String(15), nullable=True, index=True)
     amount: Mapped[Decimal] = mapped_column(Numeric(15, 2), nullable=False)
     gst_amount: Mapped[Decimal] = mapped_column(Numeric(15, 2), nullable=False)
 
@@ -54,6 +55,9 @@ class Gstr2bInvoice(Base):
         UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), index=True
     )
     supplier_gstin: Mapped[str] = mapped_column(String(15), nullable=False, index=True)
+    doc_no: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    amount: Mapped[Decimal | None] = mapped_column(Numeric(15, 2), nullable=True)
+    gst_amount: Mapped[Decimal | None] = mapped_column(Numeric(15, 2), nullable=True)
     irn: Mapped[str] = mapped_column(String(64), unique=True, nullable=True)
 
     vector_embed: Mapped[list[float]] = mapped_column(Vector(1536), nullable=False)
@@ -97,6 +101,7 @@ class ImsReconciliation(Base):
         doc="True if flagged as Blocked Credit under Section 17(5)",
     )
     confidence_score: Mapped[float] = mapped_column(Float, default=0.0)
+    reasoning: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # ORM Relationships
     erp_invoice: Mapped["ErpInvoice"] = relationship()

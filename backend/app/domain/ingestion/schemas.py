@@ -2,6 +2,7 @@ import re
 import uuid
 from decimal import Decimal
 from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
 
 
 class ParsedInvoiceRow(BaseModel):
@@ -35,6 +36,7 @@ class IngestionJobResponse(BaseModel):
     total_rows: int
     processed_rows: int
     error_message: str | None = None
+    created_at: datetime
 
     class Config:
         from_attributes = True

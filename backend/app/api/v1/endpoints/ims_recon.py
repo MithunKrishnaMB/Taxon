@@ -10,6 +10,7 @@ from app.domain.ims_recon.models import ErpInvoice, ReconStatus
 from app.domain.ims_recon.repositories import ErpInvoiceRepository, ImsReconciliationRepository
 from app.domain.ims_recon.schemas import InvoiceReconcileRequest, ReconciliationResponse, ReconciliationListResponse
 from app.domain.ims_recon.services import ImsReconciliationService
+from app.domain.audit_log.models import AuditLog, AuditActionType
 
 router = APIRouter()
 
@@ -63,7 +64,7 @@ class OverrideRequest(BaseModel):
     new_status: ReconStatus
     reasoning: str
 
-@router.put("/reconciliations/{recon_id}/override", response_model=ReconciliationListResponse)
+@router.put("/reconciliations/{recon_id}/override")
 async def manual_override_reconciliation(
     recon_id: uuid.UUID,
     payload: OverrideRequest,
@@ -76,15 +77,23 @@ async def manual_override_reconciliation(
     if not recon:
         raise HTTPException(status_code=404, detail="Reconciliation not found")
         
+    old_status = recon.status
     recon.status = payload.new_status
+    
+    erp_invoice = await session.get(ErpInvoice, recon.erp_id)
+    if erp_invoice:
+        audit = AuditLog(
+            firm_id=current_user.firm_id,
+            tenant_id=erp_invoice.tenant_id,
+            user_id=current_user.id,
+            action_type=AuditActionType.IMS_MANUAL_OVERRIDE,
+            entity_id=f"{erp_invoice.doc_no}",
+            old_state={"status": old_status.value},
+            new_state={"status": payload.new_status.value},
+            reasoning=payload.reasoning
+        )
+        session.add(audit)
+        
     await session.commit()
     
-    # We should return the updated list item format, so we can just re-fetch the list
-    # and find the specific one or just return an empty response since the frontend will refetch.
-    # Let's just return success for simplicity or re-fetch.
-    # For simplicity, returning just the basic fields is fine, but our schema expects more.
-    # Let's just return a dict that matches the schema as best as we can or just return the list format.
-    all_recons = await repo.get_reconciliations_for_tenant(recon.erp_invoice.tenant_id if hasattr(recon, 'erp_invoice') else uuid.uuid4())
-    # Actually wait, we don't have erp_invoice loaded eagerly.
-    # Let's just return a generic success message or standard format.
-    return {"id": recon.id, "invoice_number": "updated", "amount": 0, "gst_amount": 0, "status": recon.status, "ai_reasoning": payload.reasoning}
+    return {"success": True}

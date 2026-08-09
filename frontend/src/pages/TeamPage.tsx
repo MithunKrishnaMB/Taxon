@@ -77,14 +77,15 @@ export const TeamPage: React.FC = () => {
 
             {/* Filters & Search Bar */}
             <div className="bg-surface-container-lowest border border-border-muted rounded-lg p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div className="flex-1 w-full max-w-md relative group">
+                <div className={`flex-1 w-full max-w-md relative group ${users.length === 0 ? 'opacity-50' : ''}`}>
                     <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" />
                     <input
-                        className="w-full bg-surface border border-border-muted rounded-lg py-2 pl-10 pr-4 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all"
+                        className="w-full bg-surface border border-border-muted rounded-lg py-2 pl-10 pr-4 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all disabled:cursor-not-allowed"
                         placeholder="Filter by name or email..."
                         type="text"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
+                        disabled={users.length === 0}
                     />
                 </div>
                 <div className="flex gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">

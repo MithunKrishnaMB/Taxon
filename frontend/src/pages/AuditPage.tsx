@@ -43,14 +43,8 @@ export const AuditPage: React.FC = () => {
                     <h1 className="font-headline-lg text-headline-lg text-on-surface">Statutory Audit Trail</h1>
                     <p className="font-body-md text-body-md text-on-surface-variant mt-1">Chronological ledger of all manual overrides, data modifications and team actions.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-3 py-1.5 bg-surface-container-lowest border border-border-muted rounded font-body-sm text-body-sm text-secondary hover:border-primary transition-colors">
-                        <Download className="w-4 h-4" />
-                        Export CSV
-                    </button>
-                </div>
             </div>
-
+            
             {/* Data Table Container */}
             <div className="bg-surface-container-lowest border border-border-muted rounded-lg flex flex-col shadow-sm flex-1 min-h-0">
                 <div className="flex-1 overflow-auto">
@@ -106,11 +100,17 @@ export const AuditPage: React.FC = () => {
                                                 <div className="flex items-center gap-2 text-xs">
                                                     {log.old_state && log.old_state !== "None" ? (
                                                         <>
-                                                            <span className="text-secondary line-through">{log.old_state}</span>
+                                                            <span className="text-secondary line-through">
+                                                                {typeof log.old_state === 'object' ? (log.old_state.status || JSON.stringify(log.old_state)) : log.old_state}
+                                                            </span>
                                                             <ArrowRight className="w-3.5 h-3.5 text-secondary" />
                                                         </>
                                                     ) : null}
-                                                    <span className="text-on-surface font-medium">{log.new_state}</span>
+                                                    {log.new_state && log.new_state !== "None" ? (
+                                                        <span className="text-on-surface font-medium">
+                                                            {typeof log.new_state === 'object' ? (log.new_state.status || JSON.stringify(log.new_state)) : log.new_state}
+                                                        </span>
+                                                    ) : null}
                                                 </div>
                                             </td>
                                             <td className="py-3 px-4 align-top text-xs text-on-surface-variant italic">
